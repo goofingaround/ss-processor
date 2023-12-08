@@ -1,0 +1,30 @@
+name: SS Text Processor
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs every hour, on the hour
+
+jobs:
+  process-text-file:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Download text file
+      run: |
+        curl -o list.txt https://raw.githubusercontent.com/sashalsk/V2Ray/main/V2Ray-list-current
+
+    - name: Remove duplicates and filter 'ss' or 'SS'
+      run: |
+        sort -u list.txt -o list.txt
+        grep -i '^ss' list.txt > ss-list.txt
+
+    - name: Commit and push changes
+      run: |
+        git config --global user.name 'goofingaround'
+        git config --global user.email 'aroundgoofing@proton.me'
+        git add list.txt ss-list.txt
+        git commit -m "Update list and ss-list files"
+        git push
